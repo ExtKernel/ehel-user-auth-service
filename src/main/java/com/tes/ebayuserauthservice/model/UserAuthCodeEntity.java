@@ -5,10 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import java.util.Date;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.lang.Nullable;
 
 @Data
@@ -26,12 +25,6 @@ public class UserAuthCodeEntity {
     @Column(name = "expires_in")
     private int expiresIn;
 
-    @Temporal(TemporalType.DATE)
+    @CreationTimestamp
     Date creationDate;
-
-    @Temporal(TemporalType.TIME)
-    Date creationTime;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    Date creationDateTime;
 }

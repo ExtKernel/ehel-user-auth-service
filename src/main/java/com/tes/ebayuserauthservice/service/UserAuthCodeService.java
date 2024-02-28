@@ -26,7 +26,7 @@ public class UserAuthCodeService {
             Date creationTimeStart,
             Date creationTimeEnd
     ) {
-        return repository.findAllByCreationTimeBetween(creationTimeStart, creationTimeEnd);
+        return repository.findAllByCreationDateBetween(creationTimeStart, creationTimeEnd);
     }
 
     public List<UserAuthCodeEntity> findAllWithCreationDateTimeBefore(Date creationDateTime) {

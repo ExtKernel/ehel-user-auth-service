@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.tes</groupId>
     <artifactId>ebay-user-auth-service</artifactId>
-    <version>0.0.5-SNAPSHOT</version>
+    <version>0.0.6</version>
     <name>ebay-user-auth-service</name>
     <description>ebay-user-auth-service</description>
     <properties>

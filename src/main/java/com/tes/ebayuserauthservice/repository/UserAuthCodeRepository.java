@@ -13,14 +13,14 @@ public interface UserAuthCodeRepository
 
     List<UserAuthCodeEntity> findAllByCreationDate(Date creationDate);
 
-    List<UserAuthCodeEntity> findAllByCreationTimeBetween(
+    List<UserAuthCodeEntity> findAllByCreationDateBetween(
             Date creationTimeStart,
             Date creationTimeEnd
     );
 
-    @Query("select a from UserAuthCodeEntity a where a.creationDateTime <= :creationDateTime")
+    @Query("select a from UserAuthCodeEntity a where a.creationDate <= :creationDate")
     List<UserAuthCodeEntity> findAllWithCreationDateTimeBefore(
-            @Param("creationDateTime") Date creationDateTime);
+            @Param("creationDate") Date creationDate);
 
     Optional<UserAuthCodeEntity> findFirstByOrderByCreationDateDesc();
 }
