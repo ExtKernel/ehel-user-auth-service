@@ -8,23 +8,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/ebay-token")
+@RequestMapping("/auth-code")
 @RestController
 public class UserAuthCodeController {
-
     @Autowired
     private UserAuthCodeService service;
 
     @GetMapping()
-    public UserAuthCodeEntity saveAuthCode(@RequestParam String code, @RequestParam(required = false) String expires_in) {
+    public UserAuthCodeEntity saveAuthCode(@RequestParam String code, @RequestParam String expires_in) {
         System.out.println("Auth code received: " + code);
 
         UserAuthCodeEntity entity = new UserAuthCodeEntity();
         entity.setAuthCode(code);
-
-        if (expires_in != null) {
-            entity.setExpiresIn(Integer.parseInt(expires_in));
-        }
+        entity.setExpiresIn(Integer.parseInt(expires_in));
 
         return service.save(entity).get();
     }

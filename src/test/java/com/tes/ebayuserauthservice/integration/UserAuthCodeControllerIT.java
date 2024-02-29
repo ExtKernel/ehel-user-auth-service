@@ -37,10 +37,12 @@ public class UserAuthCodeControllerIT {
     public void saveAuthCode_WhenGivenCode_ShouldRespondWithUserAuthCodeEntity()
             throws Exception {
         String code = "some-sample-code";
+        int expiresIn = 3600;
 
-        mvc.perform(get("/ebay-token")
+        mvc.perform(get("/auth-code")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("code", code))
+                        .param("code", code)
+                        .param("expires_in", String.valueOf(expiresIn)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.authCode").value(code));
     }
@@ -49,12 +51,15 @@ public class UserAuthCodeControllerIT {
     public void getLatestAuthCode_WhenThereIsSavedEntity_ShouldRespondWithUserAuthCodeEntity()
             throws Exception {
         String code = "some-sample-code";
+        int expiresIn = 3600;
+
         UserAuthCodeEntity entity = new UserAuthCodeEntity();
         entity.setAuthCode(code);
+        entity.setExpiresIn(expiresIn);
 
         service.save(entity);
 
-        mvc.perform(get("/ebay-token/latest")
+        mvc.perform(get("/auth-code/latest")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }

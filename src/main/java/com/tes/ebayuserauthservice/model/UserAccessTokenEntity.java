@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Entity
-public class UserAuthCodeEntity extends UserAuthEntity{
-    @Column(name = "auth_code")
-    private String authCode;
+public class UserAccessTokenEntity extends UserAuthEntity {
+    @Column(name = "access_token", length = 2560)
+    private String accessToken;
 }
