@@ -16,17 +16,21 @@ public class UserAuthCodeController {
 
     @GetMapping()
     public UserAuthCodeEntity saveAuthCode(@RequestParam String code, @RequestParam String expires_in) {
-        System.out.println("Auth code received: " + code);
-
-        UserAuthCodeEntity entity = new UserAuthCodeEntity();
-        entity.setAuthCode(code);
-        entity.setExpiresIn(Integer.parseInt(expires_in));
-
-        return service.save(entity).get();
+        return service.save(generateUserAuthCodeEntityFromRequest(code, expires_in));
     }
 
     @GetMapping("/latest")
     public UserAuthCodeEntity getLatestAuthCode() {
-        return service.findNewest().get();
+        return service.findNewest();
+    }
+
+    private UserAuthCodeEntity generateUserAuthCodeEntityFromRequest(
+            String code,
+            String expiresIn) {
+        UserAuthCodeEntity userAuthCode = new UserAuthCodeEntity();
+        userAuthCode.setAuthCode(code);
+        userAuthCode.setExpiresIn(Integer.parseInt(expiresIn));
+
+        return userAuthCode;
     }
 }

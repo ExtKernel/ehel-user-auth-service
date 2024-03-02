@@ -63,7 +63,7 @@ public class UserAccessTokenControllerIT {
 
     @Order(1)
     @Test
-    public void generateAccessToken_WhenGivenNothing_ShouldRespondWithUserRefreshTokenEntity()
+    public void generateAccessToken_WhenGivenNothing_ShouldRespondWithUserAccessTokenEntity()
             throws Exception {
         mvc.perform(get("/access-token/generate"))
                 .andExpect(status().isOk())
@@ -73,7 +73,7 @@ public class UserAccessTokenControllerIT {
 
     @Order(2)
     @Test
-    public void getLatestAccessToken_WhenGivenNothing_ShouldRespondWithUserRefreshTokenEntity()
+    public void getLatestAccessToken_WhenGivenSavedAccessToken_ShouldRespondWithUserAccessTokenEntity()
             throws Exception {
         UserAccessTokenEntity accessToken = new UserAccessTokenEntity();
         accessToken.setAccessToken("some-sample-access-token");
@@ -88,7 +88,7 @@ public class UserAccessTokenControllerIT {
 
     @Order(3)
     @Test
-    public void renewAccessToken_WhenGivenNothing_ShouldRespondWithUserRefreshTokenEntity()
+    public void renewAccessToken_WhenGivenGeneratedRefreshToken_ShouldRespondWithUserAccessTokenEntity()
             throws Exception {
         refreshTokenService.generateAndSaveRefreshToken();
 

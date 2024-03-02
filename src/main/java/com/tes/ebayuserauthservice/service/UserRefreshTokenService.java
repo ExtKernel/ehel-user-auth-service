@@ -1,10 +1,10 @@
 package com.tes.ebayuserauthservice.service;
 
+import com.tes.ebayuserauthservice.exception.NoRecordOfRefreshTokenException;
 import com.tes.ebayuserauthservice.model.UserRefreshTokenEntity;
 import com.tes.ebayuserauthservice.repository.UserRefreshTokenRepository;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
@@ -15,9 +15,6 @@ public class UserRefreshTokenService {
     @Autowired
     private UserRefreshTokenRepository repository;
 
-    @Autowired
-    private UserAuthCodeService authCodeService;
-
     @Lazy
     @Autowired
     private UserAuthUtils authUtils;
@@ -26,20 +23,16 @@ public class UserRefreshTokenService {
     @Autowired
     EbayTokenRetriever tokenRetriever;
 
-    public Optional<UserRefreshTokenEntity> generateAndSaveRefreshToken() {
+    public UserRefreshTokenEntity generateAndSaveRefreshToken() {
         return save(generateRefreshToken());
     }
 
     public UserRefreshTokenEntity generateRefreshToken() {
-        if (authCodeService.findNewest().isPresent()) {
-            return authUtils.stripRefreshTokensFromEbayJsonMap(tokenRetriever.exchangeUserCodeForRefreshToken());
-        }
-
-        return null; // catch potential exceptions
+        return authUtils.stripRefreshTokensFromEbayJsonMap(tokenRetriever.exchangeUserCodeForRefreshToken());
     }
 
-    public Optional<UserRefreshTokenEntity> save(UserRefreshTokenEntity entity) {
-        return Optional.of(repository.save(entity));
+    public UserRefreshTokenEntity save(UserRefreshTokenEntity entity) {
+        return repository.save(entity);
     }
 
     @Cacheable(cacheNames = "RefreshTokenCache")
@@ -61,7 +54,14 @@ public class UserRefreshTokenService {
     }
 
     @Cacheable(cacheNames = "RefreshTokenCache")
-    public Optional<UserRefreshTokenEntity> findNewest() {
-        return repository.findFirstByOrderByCreationDateDesc();
+    public UserRefreshTokenEntity findNewest() {
+        if (repository.findFirstByOrderByCreationDateDesc().isPresent()) {
+            return repository.findFirstByOrderByCreationDateDesc().get();
+        } else {
+            throw new
+                    NoRecordOfRefreshTokenException
+                    ("The latest saved refresh token was not found, " +
+                            "because no record exists in the database");
+        }
     }
 }

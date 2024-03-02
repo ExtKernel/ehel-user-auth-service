@@ -1,14 +1,17 @@
 package com.tes.ebayuserauthservice.service;
 
+import com.tes.ebayuserauthservice.exception.NoRecordOfAccessTokenException;
 import com.tes.ebayuserauthservice.model.UserAccessTokenEntity;
 import com.tes.ebayuserauthservice.repository.UserAccessTokenRepository;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class UserAccessTokenService {
     @Autowired
@@ -25,24 +28,24 @@ public class UserAccessTokenService {
     @Autowired
     private EbayTokenRetriever tokenRetriever;
 
-    public UserAccessTokenEntity renewAccessToken() {
+    public UserAccessTokenEntity renewAndSaveAccessToken() {
+        return save(renewAccessToken());
+    }
+
+    private UserAccessTokenEntity renewAccessToken() {
         return authUtils.stripAccessTokensFromEbayJsonMap(tokenRetriever.renewAccessToken());
     }
 
-    public Optional<UserAccessTokenEntity> generateAndSaveAccessToken() {
+    public UserAccessTokenEntity generateAndSaveAccessToken() {
         return save(generateAccessToken());
     }
 
     private UserAccessTokenEntity generateAccessToken() {
-        if (authCodeService.findNewest().isPresent()) {
-            return authUtils.stripAccessTokensFromEbayJsonMap(tokenRetriever.exchangeUserCodeForRefreshToken());
-        }
-
-        return null; // catch potential exceptions
+        return authUtils.stripAccessTokensFromEbayJsonMap(tokenRetriever.exchangeUserCodeForRefreshToken());
     }
 
-    public Optional<UserAccessTokenEntity> save(UserAccessTokenEntity entity) {
-        return Optional.of(repository.save(entity));
+    public UserAccessTokenEntity save(UserAccessTokenEntity entity) {
+        return repository.save(entity);
     }
 
     public List<UserAccessTokenEntity> findAllByCreationDate(Date creationDate) {
@@ -60,7 +63,14 @@ public class UserAccessTokenService {
         return repository.findAllWithCreationDateTimeBefore(creationDateTime);
     }
 
-    public Optional<UserAccessTokenEntity> findNewest() {
-        return repository.findFirstByOrderByCreationDateDesc();
+    public UserAccessTokenEntity findNewest() {
+        if (repository.findFirstByOrderByCreationDateDesc().isPresent()) {
+            return repository.findFirstByOrderByCreationDateDesc().get();
+        } else {
+            throw new
+                    NoRecordOfAccessTokenException
+                    ("The latest saved access token was not found, " +
+                            "because no record exists in the database");
+        }
     }
 }

@@ -42,10 +42,10 @@ public class UserAuthUtils {
     }
 
     public UserAccessTokenEntity stripAccessTokensFromEbayJsonMap(Map<?, ?> ebayRefreshTokenJsonMap) {
-        UserAccessTokenEntity entity = new UserAccessTokenEntity();
-        entity.setAccessToken((String) ebayRefreshTokenJsonMap.get("access_token"));
-        entity.setExpiresIn((int) ebayRefreshTokenJsonMap.get("expires_in"));
+            UserAccessTokenEntity entity = new UserAccessTokenEntity();
+            entity.setAccessToken((String) ebayRefreshTokenJsonMap.get("access_token"));
+            entity.setExpiresIn((int) ebayRefreshTokenJsonMap.get("expires_in"));
 
-        return entity;
+            return entity;
     }
 }

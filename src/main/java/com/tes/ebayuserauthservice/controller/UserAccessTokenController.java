@@ -15,16 +15,16 @@ public class UserAccessTokenController {
 
     @GetMapping("/latest")
     public UserAccessTokenEntity getLatestAccessToken() {
-        return service.findNewest().get(); // catch potential exceptions
+        return service.findNewest();
     }
 
     @GetMapping("/renew")
     public UserAccessTokenEntity renewAccessToken() {
-        return service.renewAccessToken();
+        return service.renewAndSaveAccessToken();
     }
 
     @GetMapping("/generate")
     public UserAccessTokenEntity generateAccessToken() {
-        return service.generateAndSaveAccessToken().get(); // catch potential exceptions
+        return service.generateAndSaveAccessToken();
     }
 }

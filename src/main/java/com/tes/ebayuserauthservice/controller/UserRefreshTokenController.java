@@ -15,11 +15,11 @@ public class UserRefreshTokenController {
 
     @GetMapping("/latest")
     public UserRefreshTokenEntity getLatestRefreshToken() {
-        return service.findNewest().get();
+        return service.findNewest();
     }
 
     @GetMapping("/generate")
     public UserRefreshTokenEntity generateRefreshToken() {
-        return service.generateAndSaveRefreshToken().get();
+        return service.generateAndSaveRefreshToken();
     }
 }
