@@ -15,10 +15,12 @@ public class AccessTokenObjectGenerator implements TokenObjectGenerator {
     EbayTokenRetriever tokenRetriever;
 
     public UserAccessTokenEntity generateTokenFromAuthCode() {
-        return authMapsStripper.stripAccessTokenFromEbayJsonMap(tokenRetriever.exchangeUserCodeForRefreshAndAccessTokens());
+        return authMapsStripper.stripAccessTokenFromEbayJsonMap(
+                tokenRetriever.exchangeUserCodeForRefreshAndAccessTokens());
     }
 
     public UserAccessTokenEntity generateTokenFromRefreshToken() {
-        return authMapsStripper.stripAccessTokenFromEbayJsonMap(tokenRetriever.renewAccessToken());
+        return authMapsStripper
+                .stripAccessTokenFromEbayJsonMap(tokenRetriever.renewAccessToken());
     }
 }

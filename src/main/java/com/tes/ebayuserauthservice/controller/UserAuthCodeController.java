@@ -15,7 +15,10 @@ public class UserAuthCodeController {
     private UserAuthCodeService service;
 
     @GetMapping()
-    public UserAuthCodeEntity saveAuthCode(@RequestParam String code, @RequestParam String expires_in) {
+    public UserAuthCodeEntity saveAuthCode(
+            @RequestParam String code,
+            @RequestParam String expires_in
+    ) {
         return service.save(generateUserAuthCodeEntityFromRequest(code, expires_in));
     }
 

@@ -15,6 +15,7 @@ public class RefreshTokenObjectGenerator implements TokenObjectGenerator {
     EbayTokenRetriever tokenRetriever;
 
     public UserRefreshTokenEntity generateTokenFromAuthCode() {
-        return authMapsStripper.stripRefreshTokenFromEbayJsonMap(tokenRetriever.exchangeUserCodeForRefreshAndAccessTokens());
+        return authMapsStripper.stripRefreshTokenFromEbayJsonMap(
+                tokenRetriever.exchangeUserCodeForRefreshAndAccessTokens());
     }
 }

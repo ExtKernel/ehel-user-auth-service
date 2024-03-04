@@ -63,9 +63,8 @@ public class UserRefreshTokenService {
             return repository.findFirstByOrderByCreationDateDesc().get();
         } else {
             throw new
-                    NoRecordOfRefreshTokenException
-                    ("The latest saved refresh token was not found, " +
-                            "because no record exists in the database");
+                    NoRecordOfRefreshTokenException("The latest saved refresh token was not found, "
+                    + "because no record exists in the database");
         }
     }
 }

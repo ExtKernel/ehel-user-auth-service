@@ -1,6 +1,7 @@
 # Variables to inject into Java variables
 ebayClientId: ${EBAY_CLIENT_ID}
 ebayClientSecret: ${EBAY_CLIENT_SECRET}
+ebayClientRedirectUri: ${EBAY_CLIENT_REDIRECT_URI}
 ebayTokenUrl: ${EBAY_TOKEN_URL}
 
 logging:

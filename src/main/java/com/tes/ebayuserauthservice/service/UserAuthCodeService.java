@@ -45,9 +45,8 @@ public class UserAuthCodeService {
             return repository.findFirstByOrderByCreationDateDesc().get();
         } else {
             throw new
-                    NoRecordOfAuthCodeException
-                    ("The latest saved authorization code was not found, " +
-                    "because no record exists in the database");
+                    NoRecordOfAuthCodeException("The latest saved authorization code was not found, "
+                    + "because no record exists in the database");
         }
     }
 }

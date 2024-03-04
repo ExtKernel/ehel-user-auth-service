@@ -33,20 +33,23 @@ public class RestTemplateResponseErrorHandler implements ResponseErrorHandler {
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
         if (response.getStatusCode().is4xxClientError()) {
-            String responseBodyText = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
+            String responseBodyText = new String(
+                    response.getBody().readAllBytes(), StandardCharsets.UTF_8);
 
-            // if the response body contains "code", it's the error related to an expired or invalid authorization code.
-            // if it contains "refresh", it's the error related to an expired or invalid refresh token.
+            // if the response body contains "code", it's the error
+            // related to an expired or invalid authorization code.
+            // if it contains "refresh", it's the error
+            // related to an expired or invalid refresh token.
             if (responseBodyText.contains("code")) {
                 throw new
-                        ExpiredAuthCodeException
-                        ("The authorization code has expired. It was valid for: " +
-                                authCodeService.findNewest().getExpiresIn() + " seconds");
+                        ExpiredAuthCodeException("The authorization code has expired. "
+                        + "It was valid for: "
+                        + authCodeService.findNewest().getExpiresIn() + " seconds");
             } else if (responseBodyText.contains("refresh")) {
                 throw new
-                        ExpiredRefreshTokenException
-                        ("The refresh token has expired. It was valid for: " +
-                                refreshTokenService.findNewest().getExpiresIn() + " seconds");
+                        ExpiredRefreshTokenException("The refresh token has expired. "
+                        + "It was valid for: "
+                        + refreshTokenService.findNewest().getExpiresIn() + " seconds");
             }
         }
     }

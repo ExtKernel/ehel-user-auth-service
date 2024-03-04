@@ -34,16 +34,21 @@ public class UserAccessTokenService {
     private UserAccessTokenEntity generateFromRefreshToken() {
         try {
             if (checkTokenObjectGeneratorSignature() == AccessTokenObjectGenerator.class) {
-                return ((AccessTokenObjectGenerator) tokenGenerator).generateTokenFromRefreshToken();
+                return ((AccessTokenObjectGenerator) tokenGenerator)
+                        .generateTokenFromRefreshToken();
             } else {
-                AccessTokenObjectGenerator accessTokenObjectGenerator = new AccessTokenObjectGenerator();
+                AccessTokenObjectGenerator
+                        accessTokenObjectGenerator = new AccessTokenObjectGenerator();
                 
-                return accessTokenObjectGenerator.generateTokenFromRefreshToken();
+                return accessTokenObjectGenerator
+                        .generateTokenFromRefreshToken();
             }
         } catch (UnknownTokenObjectGeneratorWasInjected exception) {
-            AccessTokenObjectGenerator accessTokenObjectGenerator = new AccessTokenObjectGenerator();
+            AccessTokenObjectGenerator
+                    accessTokenObjectGenerator = new AccessTokenObjectGenerator();
             
-            return accessTokenObjectGenerator.generateTokenFromRefreshToken();
+            return accessTokenObjectGenerator
+                    .generateTokenFromRefreshToken();
         }
     }
 
@@ -80,9 +85,8 @@ public class UserAccessTokenService {
             return repository.findFirstByOrderByCreationDateDesc().get();
         } else {
             throw new
-                    NoRecordOfAccessTokenException
-                    ("The latest saved access token was not found, " +
-                            "because no record exists in the database");
+                    NoRecordOfAccessTokenException("The latest saved access token was not found, "
+                            + "because no record exists in the database");
         }
     }
 
@@ -91,13 +95,15 @@ public class UserAccessTokenService {
         if (tokenGenerator instanceof AccessTokenObjectGenerator) {
             return AccessTokenObjectGenerator.class;
         } else if (tokenGenerator instanceof RefreshTokenObjectGenerator) {
-            log.error("A RefreshTokenObjectGenerator object was injected instead of the AccessTokenObjectGenerator");
+            log.error("A RefreshTokenObjectGenerator object was injected"
+                    + " instead of the AccessTokenObjectGenerator");
 
             return RefreshTokenObjectGenerator.class;
         } else {
             log.error("An AccessTokenObjectGenerator object was not injected properly");
 
-            throw new UnknownTokenObjectGeneratorWasInjected("An unknown object was injected instead of known TokenObjectGenerator objects");
+            throw new UnknownTokenObjectGeneratorWasInjected("An unknown object was injected"
+                    + " instead of known TokenObjectGenerator objects");
         }
     }
 }

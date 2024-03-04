@@ -31,6 +31,9 @@ public class EbayTokenRetriever {
     @Value("${ebayTokenUrl}")
     private String ebayTokenUrl;
 
+    @Value("${EBAY_CLIENT_REDIRECT_URI}")
+    private String redirectUri;
+
     @Autowired
     private UserRefreshTokenService refreshTokenService;
 
@@ -38,47 +41,64 @@ public class EbayTokenRetriever {
     private UserAuthCodeService authCodeService;
 
     /**
-     * Exchanges user authorization code for refresh and access tokens by sending a POST request to the eBay token endpoint.
-     * This method prepares the necessary headers and request body with the required parameters and sends the request using RestTemplate.
+     * Exchanges user authorization code for refresh and access tokens
+     * by sending a POST request to the eBay token endpoint.
+     * This method prepares the necessary headers and request body with the required parameters
+     * and sends the request using RestTemplate.
      *
      * @return A Map containing the response body with tokens obtained from the eBay token endpoint.
      */
     public Map<?, ?> exchangeUserCodeForRefreshAndAccessTokens() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.setBasicAuth(Base64.getEncoder().encodeToString((cliendId + ":" + clientSecret).getBytes()));
+        headers.setBasicAuth(
+                Base64.getEncoder()
+                        .encodeToString((cliendId + ":" + clientSecret).getBytes()));
 
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         requestBody.add("grant_type", "authorization_code");
         requestBody.add("code", authCodeService.findNewest().getAuthCode());
-        requestBody.add("redirect_uri", "Alexander_Gamja-Alexande-auctio-lzjzbqai");
+        requestBody.add("redirect_uri", redirectUri);
 
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<MultiValueMap<String, String>>
+                requestEntity = new HttpEntity<>(requestBody, headers);
 
         RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
         RestTemplate restTemplate = restTemplateBuilder
                 .errorHandler(new RestTemplateResponseErrorHandler(authCodeService))
                 .build();
 
-        return (Map<?, ?>) restTemplate.exchange(ebayTokenUrl, HttpMethod.POST, requestEntity, Map.class).getBody();
+        return (Map<?, ?>) restTemplate.exchange(
+                ebayTokenUrl,
+                HttpMethod.POST,
+                requestEntity,
+                Map.class
+        ).getBody();
     }
 
     /**
      * Renews the access token using the refresh token obtained from the refresh token service.
-     * If no refresh token is found, a new one is generated and saved before attempting to renew the access token.
-     * This method sends a POST request to the eBay token endpoint with the refresh token in the request body.
+     * If no refresh token is found, a new one is generated and saved
+     * before attempting to renew the access token.
+     * This method sends a POST request to the eBay token endpoint
+     * with the refresh token in the request body.
      *
-     * @return A Map containing the response body with the renewed access token obtained from the eBay token endpoint.
+     * @return A Map containing the response body
+     * with the renewed access token obtained from the eBay token endpoint.
      */
     public Map<?, ?> renewAccessToken() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.setBasicAuth(Base64.getEncoder().encodeToString((cliendId + ":" + clientSecret).getBytes()));
+        headers.setBasicAuth(
+                Base64.getEncoder()
+                        .encodeToString((cliendId + ":" + clientSecret).getBytes()));
 
         String refreshToken;
 
-        // try to retrieve the newest refresh token from the refresh token service
-        // if no record of a refresh token is found, generate a new one and save it before retrying to retrieve
+        // try to retrieve the newest refresh token
+        // from the refresh token service
+        // if no record of a refresh token is found,
+        // generate a new one and save it before retrying to retrieve
         try {
             refreshToken = refreshTokenService.findNewest().getRefreshToken();
         } catch (NoRecordOfRefreshTokenException refreshTokenException) {
@@ -94,6 +114,11 @@ public class EbayTokenRetriever {
                 .errorHandler(new RestTemplateResponseErrorHandler(refreshTokenService))
                 .build();
 
-        return (Map<?, ?>) restTemplate.exchange(ebayTokenUrl, HttpMethod.POST, requestEntity, Map.class).getBody();
+        return (Map<?, ?>) restTemplate.exchange(
+                ebayTokenUrl,
+                HttpMethod.POST,
+                requestEntity,
+                Map.class
+        ).getBody();
     }
 }
