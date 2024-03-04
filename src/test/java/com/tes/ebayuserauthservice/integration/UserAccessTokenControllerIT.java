@@ -3,6 +3,7 @@ package com.tes.ebayuserauthservice.integration;
 import com.tes.ebayuserauthservice.EbayUserAuthServiceApplication;
 import com.tes.ebayuserauthservice.model.UserAccessTokenEntity;
 import com.tes.ebayuserauthservice.model.UserAuthCodeEntity;
+import com.tes.ebayuserauthservice.model.UserRefreshTokenEntity;
 import com.tes.ebayuserauthservice.service.UserAccessTokenService;
 import com.tes.ebayuserauthservice.service.UserAuthCodeService;
 import com.tes.ebayuserauthservice.service.UserRefreshTokenService;
@@ -90,11 +91,72 @@ public class UserAccessTokenControllerIT {
     @Test
     public void renewAccessToken_WhenGivenGeneratedRefreshToken_ShouldRespondWithUserAccessTokenEntity()
             throws Exception {
-        refreshTokenService.generateAndSaveRefreshToken();
+        refreshTokenService.generateAndSave();
 
         mvc.perform(get("/access-token/renew"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.expiresIn").isNotEmpty());
+    }
+
+    // testing errors
+    @Test
+    public void generateAccessToken_WhenGivenInvalidAuthCode_ShouldRespondWithInternalServerError()
+            throws Exception {
+        UserAuthCodeEntity invalidUserAuthCode = new UserAuthCodeEntity();
+        invalidUserAuthCode.setAuthCode("some-invalid-auth-code");
+        invalidUserAuthCode.setExpiresIn(3600);
+        authCodeService.save(invalidUserAuthCode);
+
+        mvc.perform(get("/access-token/generate"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message")
+                        .value("The authorization code has expired. It was valid for: " +
+                                invalidUserAuthCode.getExpiresIn() + " seconds"));
+    }
+
+    @Test
+    public void generateAccessToken_WhenGivenInvalidRefreshToken_ShouldRespondWithInternalServerError()
+            throws Exception {
+        UserAccessTokenEntity initialAccessToken = new UserAccessTokenEntity();
+        initialAccessToken.setAccessToken("some-initial-access-token");
+        initialAccessToken.setExpiresIn(3600);
+        accessTokenService.save(initialAccessToken);
+
+        UserRefreshTokenEntity invalidRefreshToken = new UserRefreshTokenEntity();
+        invalidRefreshToken.setRefreshToken("some-invalid-refresh-token");
+        invalidRefreshToken.setExpiresIn(3600);
+        refreshTokenService.save(invalidRefreshToken);
+
+        mvc.perform(get("/access-token/generate"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message")
+                        .value("The refresh token has expired. It was valid for: " +
+                                refreshTokenService.findNewest().getExpiresIn() + " seconds"));
+    }
+
+    @Test
+    public void getLatestAccessToken_WhenGivenNoSavedAccessToken_ShouldRespondWithNotFound()
+            throws Exception {
+        mvc.perform(get("/access-token/latest"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message")
+                        .value("The latest saved access token was not found," +
+                                " because no record exists in the database"));
+    }
+
+    @Test
+    public void renewAccessToken_WhenGivenInvalidRefreshToken_ShouldRespondWithInternalServerError()
+            throws Exception {
+        UserRefreshTokenEntity invalidRefreshToken = new UserRefreshTokenEntity();
+        invalidRefreshToken.setRefreshToken("some-invalid-refresh-token");
+        invalidRefreshToken.setExpiresIn(3600);
+        refreshTokenService.save(invalidRefreshToken);
+
+        mvc.perform(get("/access-token/renew"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message")
+                        .value("The refresh token has expired. It was valid for: " +
+                                invalidRefreshToken.getExpiresIn() + " seconds"));
     }
 }

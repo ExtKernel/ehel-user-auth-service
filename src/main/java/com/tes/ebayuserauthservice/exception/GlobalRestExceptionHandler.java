@@ -68,7 +68,7 @@ public class GlobalRestExceptionHandler {
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(ExpiredRefreshTokenException.class)
     public ErrorResponse handleExpiredRefreshTokenException(ExpiredRefreshTokenException exception, WebRequest request) {
-        log.warn("ExpiredAuthCodeException occurred: " + exception.getMessage());
+        log.warn("ExpiredRefreshTokenException occurred: " + exception.getMessage());
 
         return new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),

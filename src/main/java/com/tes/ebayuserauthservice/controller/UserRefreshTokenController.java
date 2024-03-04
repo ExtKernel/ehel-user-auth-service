@@ -20,6 +20,6 @@ public class UserRefreshTokenController {
 
     @GetMapping("/generate")
     public UserRefreshTokenEntity generateRefreshToken() {
-        return service.generateAndSaveRefreshToken();
+        return service.generateAndSave();
     }
 }

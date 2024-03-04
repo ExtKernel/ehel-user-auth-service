@@ -27,6 +27,7 @@ public class UserAuthCodeController {
     private UserAuthCodeEntity generateUserAuthCodeEntityFromRequest(
             String code,
             String expiresIn) {
+        // map params to an entity
         UserAuthCodeEntity userAuthCode = new UserAuthCodeEntity();
         userAuthCode.setAuthCode(code);
         userAuthCode.setExpiresIn(Integer.parseInt(expiresIn));

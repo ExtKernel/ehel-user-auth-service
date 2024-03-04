@@ -69,7 +69,7 @@ public class UserRefreshTokenControllerIT {
 
     @Order(2)
     @Test
-    public void getLatestRefreshToken_WhenGivenNothing_ShouldRespondWithUserRefreshTokenEntity()
+    public void getLatestRefreshToken_WhenGivenSavedRefreshCode_ShouldRespondWithUserRefreshTokenEntity()
             throws Exception {
         UserRefreshTokenEntity refreshToken = new UserRefreshTokenEntity();
         refreshToken.setRefreshToken("some-sample-refresh-token");
@@ -80,5 +80,31 @@ public class UserRefreshTokenControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.refreshToken").value(refreshToken.getRefreshToken()))
                 .andExpect(jsonPath("$.expiresIn").value(refreshToken.getExpiresIn()));
+    }
+
+    // testing errors
+    @Test
+    public void getLatestRefreshToken_WhenGivenNoSavedRefreshToken_ShouldRespondWithNotFound()
+            throws Exception {
+        mvc.perform(get("/refresh-token/latest"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message")
+                        .value("The latest saved refresh token was not found, " +
+                                "because no record exists in the database"));
+    }
+
+    @Test
+    public void generateRefreshToken_WhenGivenInvalidAuthCode_ShouldRespondWithInternalServerError()
+            throws Exception {
+        UserAuthCodeEntity invalidUserAuthCode = new UserAuthCodeEntity();
+        invalidUserAuthCode.setAuthCode("some-invalid-auth-code");
+        invalidUserAuthCode.setExpiresIn(3600);
+        authCodeService.save(invalidUserAuthCode);
+
+        mvc.perform(get("/refresh-token/generate"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message")
+                        .value("The authorization code has expired. It was valid for: " +
+                                invalidUserAuthCode.getExpiresIn() + " seconds"));
     }
 }

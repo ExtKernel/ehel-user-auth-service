@@ -3,6 +3,7 @@ package com.tes.ebayuserauthservice.service;
 import com.tes.ebayuserauthservice.exception.NoRecordOfAuthCodeException;
 import com.tes.ebayuserauthservice.model.UserAuthCodeEntity;
 import com.tes.ebayuserauthservice.repository.UserAuthCodeRepository;
+import jakarta.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ public class UserAuthCodeService {
     @Autowired
     private UserAuthCodeRepository repository;
 
+    @Transactional
     public UserAuthCodeEntity save(UserAuthCodeEntity entity) {
         return repository.save(entity);
     }
@@ -37,7 +39,8 @@ public class UserAuthCodeService {
     }
 
     @Cacheable(cacheNames = "AuthCodeCache")
-    public UserAuthCodeEntity findNewest() {
+    public UserAuthCodeEntity findNewest()
+            throws NoRecordOfAuthCodeException {
         if (repository.findFirstByOrderByCreationDateDesc().isPresent()) {
             return repository.findFirstByOrderByCreationDateDesc().get();
         } else {

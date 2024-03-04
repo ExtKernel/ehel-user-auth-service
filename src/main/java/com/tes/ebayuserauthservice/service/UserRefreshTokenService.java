@@ -3,9 +3,14 @@ package com.tes.ebayuserauthservice.service;
 import com.tes.ebayuserauthservice.exception.NoRecordOfRefreshTokenException;
 import com.tes.ebayuserauthservice.model.UserRefreshTokenEntity;
 import com.tes.ebayuserauthservice.repository.UserRefreshTokenRepository;
+import com.tes.ebayuserauthservice.token.RefreshTokenObjectGenerator;
+import com.tes.ebayuserauthservice.token.TokenObjectGenerator;
 import java.util.Date;
 import java.util.List;
+
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -15,22 +20,20 @@ public class UserRefreshTokenService {
     @Autowired
     private UserRefreshTokenRepository repository;
 
+    @Qualifier("refreshTokenObjectGenerator")
     @Lazy
     @Autowired
-    private UserAuthUtils authUtils;
+    private TokenObjectGenerator tokenGenerator;
 
-    @Lazy
-    @Autowired
-    EbayTokenRetriever tokenRetriever;
-
-    public UserRefreshTokenEntity generateAndSaveRefreshToken() {
-        return save(generateRefreshToken());
+    public UserRefreshTokenEntity generateAndSave() {
+        return save(generate());
     }
 
-    public UserRefreshTokenEntity generateRefreshToken() {
-        return authUtils.stripRefreshTokensFromEbayJsonMap(tokenRetriever.exchangeUserCodeForRefreshToken());
+    private UserRefreshTokenEntity generate() {
+        return (UserRefreshTokenEntity) tokenGenerator.generateTokenFromAuthCode();
     }
 
+    @Transactional
     public UserRefreshTokenEntity save(UserRefreshTokenEntity entity) {
         return repository.save(entity);
     }
@@ -54,7 +57,8 @@ public class UserRefreshTokenService {
     }
 
     @Cacheable(cacheNames = "RefreshTokenCache")
-    public UserRefreshTokenEntity findNewest() {
+    public UserRefreshTokenEntity findNewest()
+            throws NoRecordOfRefreshTokenException {
         if (repository.findFirstByOrderByCreationDateDesc().isPresent()) {
             return repository.findFirstByOrderByCreationDateDesc().get();
         } else {

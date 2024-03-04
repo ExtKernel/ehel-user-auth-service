@@ -1,7 +1,9 @@
-package com.tes.ebayuserauthservice.service;
+package com.tes.ebayuserauthservice.token;
 
 import com.tes.ebayuserauthservice.exception.NoRecordOfRefreshTokenException;
 import com.tes.ebayuserauthservice.exception.RestTemplateResponseErrorHandler;
+import com.tes.ebayuserauthservice.service.UserAuthCodeService;
+import com.tes.ebayuserauthservice.service.UserRefreshTokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +37,13 @@ public class EbayTokenRetriever {
     @Autowired
     private UserAuthCodeService authCodeService;
 
-    public Map<?, ?> exchangeUserCodeForRefreshToken() {
+    /**
+     * Exchanges user authorization code for refresh and access tokens by sending a POST request to the eBay token endpoint.
+     * This method prepares the necessary headers and request body with the required parameters and sends the request using RestTemplate.
+     *
+     * @return A Map containing the response body with tokens obtained from the eBay token endpoint.
+     */
+    public Map<?, ?> exchangeUserCodeForRefreshAndAccessTokens() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setBasicAuth(Base64.getEncoder().encodeToString((cliendId + ":" + clientSecret).getBytes()));
@@ -55,6 +63,13 @@ public class EbayTokenRetriever {
         return (Map<?, ?>) restTemplate.exchange(ebayTokenUrl, HttpMethod.POST, requestEntity, Map.class).getBody();
     }
 
+    /**
+     * Renews the access token using the refresh token obtained from the refresh token service.
+     * If no refresh token is found, a new one is generated and saved before attempting to renew the access token.
+     * This method sends a POST request to the eBay token endpoint with the refresh token in the request body.
+     *
+     * @return A Map containing the response body with the renewed access token obtained from the eBay token endpoint.
+     */
     public Map<?, ?> renewAccessToken() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -62,10 +77,12 @@ public class EbayTokenRetriever {
 
         String refreshToken;
 
+        // try to retrieve the newest refresh token from the refresh token service
+        // if no record of a refresh token is found, generate a new one and save it before retrying to retrieve
         try {
             refreshToken = refreshTokenService.findNewest().getRefreshToken();
         } catch (NoRecordOfRefreshTokenException refreshTokenException) {
-            refreshTokenService.generateAndSaveRefreshToken();
+            refreshTokenService.generateAndSave();
             refreshToken = refreshTokenService.findNewest().getRefreshToken();
         }
 

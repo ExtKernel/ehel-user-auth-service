@@ -63,4 +63,15 @@ public class UserAuthCodeControllerIT {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
+    // testing errors
+    @Test
+    public void getLatestAuthCode_WhenGivenNoSavedAuthCode_ShouldRespondWithNotFound()
+            throws Exception {
+        mvc.perform(get("/auth-code/latest"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message")
+                        .value("The latest saved authorization code was not found, " +
+                                        "because no record exists in the database"));
+    }
 }
