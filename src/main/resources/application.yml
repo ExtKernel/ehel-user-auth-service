@@ -1,14 +1,12 @@
 # Variables to inject into Java variables
-ebayClientId: ${EBAY_CLIENT_ID}
-ebayClientSecret: ${EBAY_CLIENT_SECRET}
-ebayClientRedirectUri: ${EBAY_CLIENT_REDIRECT_URI}
-ebayTokenUrl: ${EBAY_TOKEN_URL}
+ebayTokenUrl: ${EBAY_TOKEN_URL:https://api.ebay.com/identity/v1/oauth2/token}
+principalRoleName: ${PRINCIPAL_ROLE_NAME}
 
 logging:
   level:
     root: warn
 server:
-  port: ${SERVER_PORT}
+  port: ${SERVER_PORT:8000}
 spring:
   application:
     name: ebay-user-auth-service
@@ -34,3 +32,12 @@ spring:
       enabled: true
       cache:
         enabled: true
+    security:
+      oauth2:
+        resourceserver:
+          jwt:
+            issuer-uri: ${OAUTH2_PROVIDER_ISSUER_URL}
+          opaquetoken:
+            client-id: ${OAUTH2_PROVIDER_CLIENT_ID}
+            client-secret: ${OAUTH2_PROVIDER_CLIENT_SECRET}
+            introspection-uri: ${OAUTH2_PROVIDER_INTROSPECTION_URL}
