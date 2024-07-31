@@ -5,29 +5,30 @@ A service to handle authentication and authorization in the context of the eBay 
 
 ### eBay User Endpoints
 
-**Base path:** `/user`
+**Base path:** `/secured/user`
 
 #### Save a new eBay user
 - **Method:** `POST`
-- **Path:** `/user`
+- **Path:** `/secured/user`
 - **Request body example:**
     ```json
     {
         "username": "johndoe",
         "clientId": "your-ebay-client-id",
-        "clientSecret": "your-ebay-client-secret"
+        "clientSecret": "your-ebay-client-secret",
+        "redirectUrl": "your-ebay-redirect-url"
     }
     ```
 
 #### Generate a refresh token for a user
 - **Method:** `POST`
-- **Path:** `/user/refresh-token/generate/{userId}`
-- **Example:** `/user/refresh-token/generate/123`
+- **Path:** `/secured/user/refresh-token/generate/{userId}`
+- **Example:** `/secured/user/refresh-token/generate/123`
 
 #### Save a refresh token for a user
 - **Method:** `POST`
-- **Path:** `/user/refresh-token/save/{userId}`
-- **Example:** `/user/refresh-token/save/123`
+- **Path:** `/secured/user/refresh-token/save/{userId}`
+- **Example:** `/secured/user/refresh-token/save/123`
 - **Request body example:**
     ```json
     {
@@ -39,47 +40,37 @@ A service to handle authentication and authorization in the context of the eBay 
 #### Find an eBay user by ID
 *Note: This endpoint operates within this service and only accesses the service's database, not the eBay Developer API.*
 - **Method:** `GET`
-- **Path:** `/user/{userId}`
-- **Example:** `/user/123`
+- **Path:** `/secured/user/{userId}`
+- **Example:** `/secured/user/123`
 
 #### Delete an eBay user by ID
 - Method: `DELETE`
-- Path: `/user/{userId}`
-- Example: `/user/123`
+- Path: `/secured/user/{userId}`
+- Example: `/secured/user/123`
 
 ### Auth Code Endpoints
-Base path: `/auth-code`
+Base path: `/secured/auth-code`
 
 #### Save a new auth code
 You can enter this endpoint in the "Your auth accepted" field on the "User Tokens" page of your eBay Developer account.
 - Method: `GET`
-- Path: `/auth-code`
+- Path: `/secured/auth-code`
 - Query parameters:
     - `code` (required)
     - `expires_in` (required)
-- Example: `/auth-code?code=your-auth-code&expires_in=3600`
+- Example: `/secured/auth-code?code=your-auth-code&expires_in=3600`
 
 #### Find the latest auth code
 - Method: `GET`
-- Path: `/auth-code/latest`
+- Path: `/secured/auth-code/latest`
 
 ## Environment Variables
 
 The following environment variables are used to configure the Product Retriever Service. They should be set in your environment or configuration files to ensure proper operation.
 
 ### eBay API URLs
-- **EBAY_BROWSE_API_ITEM_SUMMARY_URL**
-    - This environment variable specifies the URL for the eBay Browse API's item summary endpoint.
-
-- **EBAY_BROWSE_API_GET_ITEM_URL**
-    - This variable defines the URL for the eBay Browse API's get item endpoint.
-
-### Token Retrieval
-- **ACCESS_TOKEN_RETRIEVE_URI**
-    - URL used to retrieve the access token from eBay’s OAuth2 system.
-
-- **REFRESH_TOKEN_RETRIEVE_URI**
-    - URL used to retrieve the refresh token from eBay’s OAuth2 system.
+- **EBAY_TOKEN_URL**
+    - URL used to retrieve the tokens from eBay’s OAuth2 system.
 
 ### Security and Roles
 - **PRINCIPAL_ROLE_NAME**
